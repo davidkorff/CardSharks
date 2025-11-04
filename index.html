@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSA Card Lookup Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .token-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .token-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .token-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .token-section small {
+            display: block;
+            margin-top: 8px;
+            color: #666;
+        }
+        
+        .token-section a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .token-section a:hover {
+            text-decoration: underline;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .results-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        #results {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+        }
+        
+        .progress {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #c33;
+        }
+        
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #3c3;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🃏 PSA Card Lookup Tool</h1>
+        <p class="subtitle">Just paste your certificate numbers and click lookup - token is already configured!</p>
+        
+        <div class="instructions">
+            <h3>📋 How to Use:</h3>
+            <ol>
+                <li>Enter certificate numbers (one per line) in the input box below</li>
+                <li>Click "Run Lookup" and wait for results</li>
+                <li>Copy the formatted results and paste into your spreadsheet</li>
+                <li><strong>If you get token errors:</strong> Open this file in a text editor, find <code>HARDCODED_TOKEN</code>, and replace it with a new token from <a href="https://www.psacard.com/publicapi/documentation" target="_blank">psacard.com/publicapi/documentation</a></li>
+            </ol>
+        </div>
+        
+        <!-- Token is hardcoded below - update HARDCODED_TOKEN variable if it expires -->
+        <div class="token-section" style="display: none;">
+            <label for="apiToken">PSA API Token:</label>
+            <input 
+                type="password" 
+                id="apiToken" 
+                placeholder="Paste your PSA API token here..."
+            >
+            <small>Get your token from <a href="https://www.psacard.com/publicapi/documentation" target="_blank">PSA API Documentation</a> (tokens expire periodically)</small>
+        </div>
+        
+        <div class="input-section">
+            <label for="certNumbers">Certificate Numbers (one per line):</label>
+            <textarea 
+                id="certNumbers" 
+                placeholder="109726811&#10;12345678&#10;87654321"
+            ></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="runLookup()">▶️ Run Lookup</button>
+            <button class="btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+        </div>
+        
+        <div id="progress" class="progress">
+            <div id="progressText">Processing...</div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill">0%</div>
+            </div>
+        </div>
+        
+        <div id="statusMessage"></div>
+        
+        <div class="results-section">
+            <div class="stats" style="display: none;" id="statsContainer">
+                <div class="stat">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="successCount" style="color: #28a745;">0</div>
+                    <div class="stat-label">Success</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="errorCount" style="color: #dc3545;">0</div>
+                    <div class="stat-label">Errors</div>
+                </div>
+            </div>
+            
+            <label for="results">Results (copy and paste to your sheet):</label>
+            <textarea 
+                id="results" 
+                placeholder="Results will appear here..."
+                readonly
+            ></textarea>
+            <button class="btn-secondary" onclick="copyResults()" style="margin-top: 10px;">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://api.psacard.com/publicapi';
+        
+        // ⚠️ HARDCODED TOKEN - UPDATE THIS WHEN IT EXPIRES ⚠️
+        // Get a new token from: https://www.psacard.com/publicapi/documentation
+        const HARDCODED_TOKEN = 'v58mFkEcPsfhJEiNm0PBMOsoHmx4D32IptyXNFGQCT-PvCoYuZzaA9WbfwNnGDtl-bAR9fg9HAYSy2pH9dQQGD2Yp_mPgndSYBWmm5ysS5ISS9C8pNhWWXM8pw1__zkUV80bhQ7paOAQ-MXFfEecf0iyhbIyaJkq0akdOcEJz4pRkFFFmmd6c1TrnXUKTjYhuW63WsPLEIsG8rRX0aqSQ-qxr4cH5O-sBn8fse8UjeaM666fwaBN4ujwfOi5diwfOmu0m3nmJGGj2mqwXfh-don3hXiUF77_yp5EMP_GYRJs-wXL';
+        
+        async function runLookup() {
+            // Use hardcoded token instead of input field
+            const token = HARDCODED_TOKEN;
+            const certNumbersText = document.getElementById('certNumbers').value.trim();
+            
+            // Validation
+            if (!token) {
+                showMessage('Token not configured. Please update HARDCODED_TOKEN in the script.', 'error');
+                return;
+            }
+            
+            if (!certNumbersText) {
+                showMessage('Please enter at least one certificate number', 'error');
+                return;
+            }
+            
+            // Parse certificate numbers
+            const certNumbers = certNumbersText
+                .split('\n')
+                .map(num => num.trim())
+                .filter(num => num && /^\d+$/.test(num));
+            
+            if (certNumbers.length === 0) {
+                showMessage('No valid certificate numbers found. Please enter numbers only (one per line)', 'error');
+                return;
+            }
+            
+            // Reset UI
+            document.getElementById('results').value = '';
+            document.getElementById('statusMessage').innerHTML = '';
+            document.getElementById('progress').style.display = 'block';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.querySelector('.btn-primary').disabled = true;
+            
+            // Process lookups
+            const results = [];
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < certNumbers.length; i++) {
+                const certNumber = certNumbers[i];
+                const progress = Math.round(((i + 1) / certNumbers.length) * 100);
+                
+                updateProgress(progress, `Processing ${i + 1} of ${certNumbers.length}...`);
+                
+                try {
+                    const result = await fetchPSACard(token, certNumber);
+                    
+                    if (result.success) {
+                        results.push(result.formatted);
+                        successCount++;
+                    } else {
+                        results.push(`ERROR: ${result.error}`);
+                        errorCount++;
+                    }
+                } catch (error) {
+                    results.push(`ERROR: ${error.message}`);
+                    errorCount++;
+                }
+                
+                // Small delay to avoid rate limiting
+                if (i < certNumbers.length - 1) {
+                    await sleep(200);
+                }
+            }
+            
+            // Display results
+            document.getElementById('results').value = results.join('\n');
+            document.getElementById('progress').style.display = 'none';
+            document.querySelector('.btn-primary').disabled = false;
+            
+            // Show stats
+            document.getElementById('statsContainer').style.display = 'flex';
+            document.getElementById('totalCount').textContent = certNumbers.length;
+            document.getElementById('successCount').textContent = successCount;
+            document.getElementById('errorCount').textContent = errorCount;
+            
+            // Show summary message
+            if (errorCount === 0) {
+                showMessage(`✅ Successfully processed all ${certNumbers.length} certificates!`, 'success');
+            } else {
+                showMessage(`⚠️ Processed ${certNumbers.length} certificates: ${successCount} successful, ${errorCount} errors`, 'error');
+            }
+        }
+        
+        async function fetchPSACard(token, certNumber) {
+            try {
+                const url = `${API_BASE_URL}/cert/GetByCertNumber/${certNumber}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Check if response is HTML (Cloudflare challenge)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                    return {
+                        success: false,
+                        error: 'Cloudflare challenge detected. Please refresh and try again.'
+                    };
+                }
+                
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        return {
+                            success: false,
+                            error: 'Token expired or invalid. Generate new token at psacard.com'
+                        };
+                    } else if (response.status === 404) {
+                        return {
+                            success: false,
+                            error: 'Certificate not found'
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            error: `HTTP ${response.status}`
+                        };
+                    }
+                }
+                
+                const data = await response.json();
+                
+                if (data.PSACert) {
+                    const card = data.PSACert;
+                    const formatted = `${card.Year || 'N/A'} ${card.Brand || 'N/A'} ${card.Subject || 'N/A'} ${card.Variety || 'N/A'} ${card.CardGrade || 'N/A'}`;
+                    
+                    return {
+                        success: true,
+                        formatted: formatted
+                    };
+                } else {
+                    return {
+                        success: false,
+                        error: data.ServerMessage || 'No data found'
+                    };
+                }
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').textContent = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+        
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = type;
+            statusDiv.textContent = message;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function clearAll() {
+            document.getElementById('certNumbers').value = '';
+            document.getElementById('results').value = '';
+            document.getElementById('statusMessage').innerHTML = '';
+            document.getElementById('statsContainer').style.display = 'none';
+        }
+        
+        function copyResults() {
+            const results = document.getElementById('results');
+            results.select();
+            document.execCommand('copy');
+            showMessage('✅ Results copied to clipboard!', 'success');
+        }
+    </script>
+</body>
+</html>
